@@ -1,0 +1,5 @@
+from .gnn_classifier import GNNClassifier
+from .nnconv_classifier import NNConvClassifier
+from .original_max_pool_simple_gcn_classifier import OriginalMaxPoolSimpleGCNClassifier
+from .original_simple_gcn_classifier import OriginalSimpleGCNClassifier
+from .simple_gcn_classifier import SimpleGCNClassifier
