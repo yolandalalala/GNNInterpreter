@@ -5,6 +5,8 @@ import networkx as nx
 import numpy as np
 import torch
 import torch_geometric as pyg
+from torchmetrics import F1Score
+from tqdm.auto import tqdm
 
 from .utils import default_ax
 
@@ -20,16 +22,27 @@ class BaseGraphDataset(pyg.data.InMemoryDataset, ABC):
                  pre_filter=None,
                  seed=None):
         self.name = name
-        self.seed = seed
-        if seed is not None:
-            random.seed(seed)
-            np.random.seed(seed)
-            torch.manual_seed(seed)
+        self._seed_all(seed)
         super().__init__(root=f'{self.DATA_ROOT}/{name}',
                          transform=transform,
                          pre_transform=pre_transform,
                          pre_filter=pre_filter)
         self.data, self.slices = torch.load(self.processed_paths[0])
+
+    def _seed_all(self, seed):
+        self.seed = seed
+        if seed is not None:
+            random.seed(seed)
+            np.random.seed(seed)
+            torch.manual_seed(seed)
+
+    def train_test_split(self, k=10):
+        train = self[len(self)//k:]
+        test = self[:len(self)//k]
+        return train, test
+
+    def loader(self, *args, **kwargs):
+        return pyg.data.DataLoader(self, *args, **kwargs)
 
     @property
     def processed_file_names(self):
@@ -102,3 +115,20 @@ class BaseGraphDataset(pyg.data.InMemoryDataset, ABC):
         n = [data.G.number_of_nodes() for data in self]
         m = [data.G.number_of_edges() for data in self]
         return dict(mean_n=np.mean(n), mean_m=np.mean(m), std_n=np.std(n), std_m=np.std(m))
+
+    @torch.no_grad()
+    def evaluate_model(self, model, batch_size=32):
+        f1 = F1Score(task="multiclass", num_classes=len(self.GRAPH_CLS), average=None)
+        model.eval()
+        for batch in self.loader(batch_size=batch_size):
+            f1(model(batch)['logits'], batch.y)
+        return dict(zip(self.GRAPH_CLS.values(), f1.compute().tolist()))
+
+    @torch.no_grad()
+    def mean_embeddings(self, model, batch_size=32):
+        embeds = [[] for _ in range(len(self.GRAPH_CLS))]
+        model.eval()
+        for batch in self.loader(batch_size=batch_size):
+            for i, e in enumerate(model(batch)['embeds']):
+                embeds[batch.y[i].item()].append(e)
+        return [torch.stack(e, dim=0).mean(axis=0) for e in embeds]

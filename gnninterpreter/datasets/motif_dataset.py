@@ -84,7 +84,7 @@ class MotifDataset(RomeDataset):
         return self.convert(motif)
 
     # TODO: reprocess when motif changed
-    def  __init__(self, name="Motif", **kwargs):
+    def __init__(self, name="Motif", **kwargs):
         super().__init__(name=name, **kwargs)
 
     def generate(self):

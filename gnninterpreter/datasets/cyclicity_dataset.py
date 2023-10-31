@@ -23,18 +23,9 @@ class CyclicityDataset(RomeDataset):
         2: 'acyclic',
     }
 
-    # TODO: do not share root with rome
     # TODO: reprocess when motif changed
-    def __init__(self, seed=None, *args, **kwargs):
-        if seed is not None:
-            random.seed(seed)
-        self.seed = seed
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, name="Cyclicity", **kwargs)
-
-    # TODO: include random seed in file name
-    @property
-    def processed_file_names(self):
-        return [f'data_heterocyclic_{self.seed}.pt' if self.seed is not None else 'data_heterocyclic.pt']
 
     def generate(self):
         for G in super().generate():
@@ -83,11 +74,11 @@ class CyclicityDataset(RomeDataset):
         pos = pos or nx.kamada_kawai_layout(G)
         nx.draw(G, pos,
                 ax=ax,
-                node_size=600,
+                node_size=0,
                 edgelist=G.edges,
                 edge_color=[self.EDGE_CLS[attr['label']] for u, v, attr in G.edges(data=True)],
                 node_color="k",
-                width=[20 if 'is_cycle' in attr and attr['is_cycle'] else 10 for u, v, attr in G.edges(data=True)])
+                width=[10 if 'is_cycle' in attr and attr['is_cycle'] else 5 for u, v, attr in G.edges(data=True)])
 
     def draw_gt(self, cls, ax=None):
         G = nx.generators.cycle_graph(6)
