@@ -1,6 +1,6 @@
 # GNNInterpreter: A Probabilistic Generative Model-Level Explanation for Graph Neural Networks
 
-This repo contains demonstrations for the International Conference on Learning Representation paper entitled "[GNNInterpreter: A Probabilistic Generative Model-Level Explanation for Graph Neural Networks](https://arxiv.org/abs/2209.07924)".
+This repo contains demonstrations for the International Conference on Learning Representation paper entitled "[GNNInterpreter: A Probabilistic Generative Model-Level Explanation for Graph Neural Networks](https://openreview.net/forum?id=rqq6Dh8t4d)".
 
 ## Notebooks
 * `model_explanation_cyclicity.ipynb` contains the demo for the Cyclicity dataset experiment in the paper.

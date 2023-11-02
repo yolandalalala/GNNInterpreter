@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from .nn.functional import smooth_maximum_weight_propagation, global_mean_pool_weighted
+from .nn.functional import smooth_maximum_weight_propagation, global_mean_pool_weighted, global_sum_pool_weighted
 from .nn.nnconv import NNConv
 
 
@@ -42,12 +42,14 @@ class NNConvClassifier(nn.Module):
         x = self.conv5(x, edge_index, edge_attr, edge_weight)
 
         # 2. Readout layer
-        feats = x = global_mean_pool_weighted(x, batch=batch.batch, node_weight=node_weight)
+        embeds = torch.cat([
+            global_sum_pool_weighted(x, batch=batch.batch, node_weight=node_weight),
+            global_mean_pool_weighted(x, batch=batch.batch, node_weight=node_weight),
+        ], dim=1)
 
         # 3. Apply a final classifier
-        # x = F.dropout(x, p=0.3, training=self.training)
-        embeds = x = self.lin1(x)
+        x = self.lin1(embeds)
         x = self.act(x)
         x = self.out(x)
 
-        return dict(logits=x, probs=F.softmax(x, dim=-1), feats=feats, embeds=embeds)
+        return dict(logits=x, probs=F.softmax(x, dim=-1), embeds=embeds)
