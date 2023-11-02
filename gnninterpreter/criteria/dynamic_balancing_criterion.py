@@ -17,4 +17,4 @@ class DynamicBalancingCriterion(nn.Module):
         mask[:, self.classes] = True
         score = logits * probs ** 2
         score[mask] = logits[mask] * (1 - probs[mask]) ** 2
-        return (score[~mask].mean(dim=-1) - score[mask].mean(dim=-1)).mean()
+        return (self.beta * score[~mask].mean(dim=-1) - self.alpha * score[mask].mean(dim=-1)).mean()

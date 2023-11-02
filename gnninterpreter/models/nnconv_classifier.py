@@ -21,7 +21,7 @@ class NNConvClassifier(nn.Module):
         self.conv5 = NNConv(hidden_channels, hidden_channels,
                             nn=nn.Linear(edge_features, hidden_channels*hidden_channels))
         self.act = nn.LeakyReLU(inplace=True)
-        self.lin1 = nn.Linear(hidden_channels, hidden_channels)
+        self.lin1 = nn.Linear(hidden_channels*2, hidden_channels)
         self.out = nn.Linear(hidden_channels, num_classes)
 
     # potential bug if pass edge_weight separately

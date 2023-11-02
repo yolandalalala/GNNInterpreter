@@ -4,6 +4,7 @@ import random
 import networkx as nx
 import numpy as np
 import torch
+from torch import nn
 import torch_geometric as pyg
 from torchmetrics import F1Score
 from tqdm.auto import tqdm
@@ -116,11 +117,25 @@ class BaseGraphDataset(pyg.data.InMemoryDataset, ABC):
         m = [data.G.number_of_edges() for data in self]
         return dict(mean_n=np.mean(n), mean_m=np.mean(m), std_n=np.std(n), std_m=np.std(m))
 
+    def fit_model(self, model, batch_size=32, lr=0.01):
+        optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+        criterion = nn.CrossEntropyLoss()
+        model.train()
+        losses = []
+        for batch in self.loader(batch_size=batch_size, shuffle=True):
+            model.zero_grad()  # Clear gradients.
+            out = model(batch)  # Perform a single forward pass.
+            loss = criterion(out['logits'], batch.y)  # Compute the loss.
+            loss.backward()  # Derive gradients.
+            optimizer.step()  # Update parameters based on gradients.
+            losses.append(loss.item())
+        return np.mean(losses)
+
     @torch.no_grad()
     def evaluate_model(self, model, batch_size=32):
         f1 = F1Score(task="multiclass", num_classes=len(self.GRAPH_CLS), average=None)
         model.eval()
-        for batch in self.loader(batch_size=batch_size):
+        for batch in self.loader(batch_size=batch_size, shuffle=False):
             f1(model(batch)['logits'], batch.y)
         return dict(zip(self.GRAPH_CLS.values(), f1.compute().tolist()))
 
@@ -128,7 +143,7 @@ class BaseGraphDataset(pyg.data.InMemoryDataset, ABC):
     def mean_embeddings(self, model, batch_size=32):
         embeds = [[] for _ in range(len(self.GRAPH_CLS))]
         model.eval()
-        for batch in self.loader(batch_size=batch_size):
+        for batch in self.loader(batch_size=batch_size, shuffle=False):
             for i, e in enumerate(model(batch)['embeds']):
                 embeds[batch.y[i].item()].append(e)
         return [torch.stack(e, dim=0).mean(axis=0) for e in embeds]

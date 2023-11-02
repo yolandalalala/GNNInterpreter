@@ -68,9 +68,9 @@ class Trainer:
             cont_out = self.discriminator(cont_data, edge_weight=cont_data.edge_weight)
             disc_out = self.discriminator(disc_data, edge_weight=disc_data.edge_weight)
             if penalty_cond and penalty_cond(disc_out, self):
-                dynamic_penalty.weight += 1
-            elif dynamic_penalty.weight >= min_penalty + 0.1:
-                dynamic_penalty.weight -= 0.1
+                dynamic_penalty.weight *= 1.1
+            elif dynamic_penalty.weight > min_penalty:
+                dynamic_penalty.weight *= 0.95
             if break_cond and break_cond(disc_out, self):
                 break
             loss = self.criterion(cont_out).mean()
