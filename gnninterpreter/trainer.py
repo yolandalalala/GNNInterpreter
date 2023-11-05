@@ -17,11 +17,22 @@ import torch_geometric as pyg
 
 
 class Trainer:
-    def __init__(self, sampler, discriminator, criterion, scheduler, optimizer, dataset, k_samples):
+    def __init__(self,
+                 sampler,
+                 discriminator,
+                 criterion,
+                 scheduler,
+                 optimizer,
+                 dataset,
+                 budget_penalty=None,
+                 target_probs: dict[tuple[float, float]] = None,
+                 k_samples=32):
         self.k = k_samples
+        self.target_probs = target_probs
         self.sampler = sampler
         self.discriminator = discriminator
         self.criterion = criterion
+        self.budget_penalty = budget_penalty
         self.scheduler = scheduler
         self.optimizer = optimizer if isinstance(optimizer, list) else [optimizer]
         self.dataset = dataset
@@ -51,13 +62,13 @@ class Trainer:
             self.sampler.init()
             self.train(iterations)
 
-    def train(self, iterations, dynamic_penalty=None, penalty_cond=None, break_cond=None):
+    def train(self, iterations):
         self.bkup_state = copy.deepcopy(self.sampler.state_dict())
         self.bkup_criterion = copy.deepcopy(self.criterion)
         self.bkup_iteration = self.iteration
         self.discriminator.eval()
         self.sampler.train()
-        min_penalty = dynamic_penalty.weight if dynamic_penalty else 0
+        budget_penalty_weight = 1
         for _ in (bar := tqdm(range(int(iterations)), initial=self.iteration, total=self.iteration+iterations)):
             for opt in self.optimizer:
                 opt.zero_grad()
@@ -66,13 +77,19 @@ class Trainer:
             # TODO: potential bug
             cont_out = self.discriminator(cont_data, edge_weight=cont_data.edge_weight)
             disc_out = self.discriminator(disc_data, edge_weight=disc_data.edge_weight)
-            if penalty_cond and penalty_cond(disc_out, self):
-                dynamic_penalty.weight *= 1.1
-            elif dynamic_penalty.weight > min_penalty:
-                dynamic_penalty.weight *= 0.95
-            if break_cond and break_cond(disc_out, self):
-                break
-            loss = self.criterion(cont_out).mean()
+            if self.target_probs and all([
+                min_p <= disc_out["probs"][0, classes].item() <= max_p
+                for classes, (min_p, max_p) in self.target_probs.items()
+            ]):
+                if self.budget_penalty and self.sampler.expected_m <= self.budget_penalty.budget:
+                    break
+                budget_penalty_weight *= 1.1
+            else:
+                budget_penalty_weight *= 0.95
+
+            loss = self.criterion(cont_out | self.sampler.to_dict())
+            if self.budget_penalty:
+                loss += self.budget_penalty(self.sampler.theta) * budget_penalty_weight
             loss.backward()  # Back-propagate gradients
 
             # print(self.sampler.omega.grad)
@@ -86,7 +103,7 @@ class Trainer:
             size = self.sampler.expected_m
             scores = disc_out["logits"].mean(axis=0).tolist()
             score_dict = {v: scores[k] for k, v in self.dataset.GRAPH_CLS.items()}
-            penalty_weight = {'penalty': dynamic_penalty.weight} if dynamic_penalty else {}
+            penalty_weight = {'bpw': budget_penalty_weight} if self.budget_penalty else {}
             bar.set_postfix({'size': size} | penalty_weight | score_dict)
             # print(f"{iteration=}, loss={loss.item():.2f}, {size=}, scores={score_dict}")
             self.iteration += 1

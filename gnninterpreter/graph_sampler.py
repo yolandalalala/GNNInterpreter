@@ -44,15 +44,20 @@ class GraphSampler(nn.Module):
         self.edge_cls = self._gen_random_cls(self.m, self.l) if num_edge_cls else None
         self.tau = temperature
 
+        self.param_list = []
+
         self.omega = nn.Parameter(torch.empty(self.m))
+        self.param_list.extend(["omega", "theta", "theta_pairs"])
 
         if learn_node_feat:
             self.xi = nn.Parameter(torch.empty(self.n, self.k))
+            self.param_list.extend(["xi", "p"])
         else:
             self.xi = None
 
         if learn_edge_feat:
             self.eta = nn.Parameter(torch.empty(self.m, self.l))
+            self.param_list.extend(["eta", "q"])
         else:
             self.eta = None
 
@@ -139,17 +144,19 @@ class GraphSampler(nn.Module):
         Generate edge indices for adjacent edge pairs.
         :return: tensor of shape [2, k]
         """
-        edges = list(zip(*self.edge_index))
+        edges = self.edge_index.T[:self.m]
         pairs = [(i, j)
-                 for i in range(len(edges))
-                 for j in range(len(edges))
-                 if i != j and edges[i][0] == edges[j][0]]
-        # assert len(pairs) == self.n * (self.n-1) * (self.n-2)
+                 for i in range(self.m-1)
+                 for j in range(i+1, self.m)
+                 if edges[i][0] == edges[j][0]]
         return torch.tensor(pairs).T
 
     @property
     def theta_pairs(self) -> torch.Tensor:
-        return torch.cat([self.theta, self.theta])[self.pair_index]
+        return self.theta[self.pair_index]
+
+    def to_dict(self):
+        return {item: getattr(self, item) for item in self.param_list}
 
     def sample_eps(self, target, seed=None, expected=False):
         if expected:

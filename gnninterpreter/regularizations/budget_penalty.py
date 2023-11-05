@@ -1,14 +1,14 @@
-from . import BaseRegularization
 import torch.nn.functional as F
+from torch import nn
 
-class BudgetPenalty(BaseRegularization):
-    def __init__(self, getter, budget=0, order=1, beta=1, weight=1, mean=True, **kwargs):
-        super().__init__(getter, weight, mean, **kwargs)
+
+class BudgetPenalty(nn.Module):
+    def __init__(self, budget=0, order=1, beta=1):
+        super().__init__()
         self.budget = budget
         self.beta = beta
         self.order = order
 
-    def penalty(self, x):
-        # compute budget deficit
-        return F.softplus(x.sum() - self.budget, beta=self.beta) ** self.order
+    def forward(self, theta):
+        return F.softplus(theta.sum() - self.budget, beta=self.beta) ** self.order
 

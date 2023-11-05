@@ -1,12 +1,11 @@
-from . import BaseRegularization
+from torch import nn
 
 
-class NormPenalty(BaseRegularization):
-    def __init__(self, getter, order=2, weight=1, mean=True, **kwargs):
-        super().__init__(getter, weight, mean, **kwargs)
+class NormPenalty(nn.Module):
+    def __init__(self, order=2):
+        super().__init__()
         self.order = order
 
-    def penalty(self, x):
-        # compute norm
+    def forward(self, x):
         return x.norm(p=self.order)
 
