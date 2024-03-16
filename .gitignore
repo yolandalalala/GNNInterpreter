@@ -2,3 +2,6 @@
 **/.ipynb_checkpoints/
 data/
 **/__pycache__/
+sampler_ckpts/
+*.db
+.DS_Store
