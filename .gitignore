@@ -5,3 +5,4 @@ data/
 sampler_ckpts/
 *.db
 .DS_Store
+*.zip

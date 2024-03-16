@@ -43,6 +43,10 @@ Paper: https://arxiv.org/pdf/2209.07924.pdf
 * You can find the GNN classifier checkpoints in the `ckpts` folder.
 * See `model_training.ipynb` for how to load the model checkpoints.
 
+### Datasets
+* Here's the [link](https://drive.google.com/file/d/1L1U2YnjqbfX5TqKt_d86_X_XGOQHmIhf/view?usp=share_link) for downloading the processed datasets.
+* After downloading the datasets zip, please `unzip` it in the root folder.
+
 ### Environment
 Codes in this repo have been tested on `python3.10` + `pytorch2.0` + `pyg2.3`.
 
