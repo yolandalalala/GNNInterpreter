@@ -55,7 +55,7 @@ To reproduce the exact python environment, please run:
 conda env create -n gnninterpreter -f environment.yml
 conda activate gnninterpreter
 pip install torch_geometric
-pip install torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.0+cpu.html
+pip install --no-cache-dir --ignore-installed torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.0+cpu.html
 ```
 
 ## 🖼️ Demo
