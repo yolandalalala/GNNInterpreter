@@ -50,6 +50,14 @@ Paper: https://arxiv.org/pdf/2209.07924.pdf
 ### Environment
 Codes in this repo have been tested on `python3.10` + `pytorch2.0` + `pyg2.3`.
 
+To reproduce the exact python environment, please run:
+```bash
+conda env create -n gnninterpreter -f environment.yml
+conda activate gnninterpreter
+pip install torch_geometric
+pip install torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.0+cpu.html
+```
+
 ## 🖼️ Demo
 ![demo](figures/demo.png)
 
