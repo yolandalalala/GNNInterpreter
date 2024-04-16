@@ -2,8 +2,8 @@ import networkx as nx
 import pandas as pd
 import torch_geometric as pyg
 
-from .base_graph_dataset import BaseGraphDataset
-from .utils import default_ax, unpack_G
+from gnn_xai_common.datasets import BaseGraphDataset
+from gnn_xai_common.datasets.utils import default_ax, unpack_G
 
 
 class MUTAGDataset(BaseGraphDataset):

@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "gnninterpreter"
+version = "1.0.0"
+description = ""
+authors = ["Xiaoqi Wang <xiaoqiwang2582@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+jupyter = "^1.0.0"
+ipython = "^8.23.0"
+gnn-xai-common = {path = "../gnn-xai-common"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

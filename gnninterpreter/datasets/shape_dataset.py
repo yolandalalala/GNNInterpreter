@@ -4,8 +4,8 @@ import networkx as nx
 import numpy as np
 from tqdm.auto import trange
 
-from .base_graph_dataset import BaseGraphDataset
-from .utils import default_ax
+from gnn_xai_common.datasets import BaseGraphDataset
+from gnn_xai_common.datasets.utils import default_ax, unpack_G
 
 
 class ShapeDataset(BaseGraphDataset):

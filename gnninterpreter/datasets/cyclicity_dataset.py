@@ -2,8 +2,8 @@ import random
 
 import networkx as nx
 
-from .rome_dataset import RomeDataset
-from .utils import default_ax
+from gnn_xai_common.datasets import RomeDataset
+from gnn_xai_common.datasets.utils import default_ax, unpack_G
 
 
 class CyclicityDataset(RomeDataset):
