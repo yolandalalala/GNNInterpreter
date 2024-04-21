@@ -52,15 +52,10 @@ Codes in this repo have been tested on `python3.10` + `pytorch2.0` + `pyg2.3`.
 
 To reproduce the exact python environment, please run:
 ```bash
-conda create -n gnninterpreter python=3.10 poetry
+conda create -n gnninterpreter poetry jupyter
 conda activate gnninterpreter
 poetry install
 ipython kernel install --user --name=gnninterpreter --display-name="GNNInterpreter"
-
-# On Apple Silicon, please also run the following command
-pip install -U --no-cache-dir --ignore-installed torch-scatter torch-sparse
-
-pip install --no-cache-dir --ignore-installed torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.0+cpu.html
 ```
 
 ## 🖼️ Demo
