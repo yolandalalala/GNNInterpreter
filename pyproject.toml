@@ -9,7 +9,7 @@ readme = "README.md"
 python = "^3.10"
 jupyter = "^1.0.0"
 ipython = "^8.23.0"
-gnn-xai-common = {path = "../gnn-xai-common"}
+gnn-xai-common = { git = "https://github.com/yolandalalala/gnn-xai-core.git", branch = "main" }
 
 
 [build-system]

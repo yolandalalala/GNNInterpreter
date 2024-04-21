@@ -941,8 +941,10 @@ torchmetrics = "^1.3.2"
 tqdm = "^4.66.2"
 
 [package.source]
-type = "directory"
-url = "../gnn-xai-common"
+type = "git"
+url = "https://github.com/yolandalalala/gnn-xai-core.git"
+reference = "main"
+resolved_reference = "9dfcb3b4aa1adac193d05d317b7404f2390389ed"
 
 [[package]]
 name = "h11"
@@ -3706,4 +3708,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e2d35a7a46042f593c5b626439022f4de386c019fc840a3dfca86535f56a8dba"
+content-hash = "ddac873e693df86a4ae11bda15e0564beb6969622dcac6d079dcae5b76e7aff8"
