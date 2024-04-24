@@ -58,6 +58,11 @@ poetry install
 ipython kernel install --user --name=gnninterpreter --display-name="GNNInterpreter"
 ```
 
+Note: In case poetry fails to install the dependencies, you can manually install them using `pip`:
+```bash
+pip install -r requirements.txt
+````
+
 ## 🖼️ Demo
 ![demo](figures/demo.png)
 
