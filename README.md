@@ -66,7 +66,7 @@ pip install -r requirements.txt
 ## 🖼️ Demo
 ![demo](figures/demo.png)
 
-##  Subsequent Work
+## 🔗 Subsequent Work - GNNBoundary
 Beyond the model-level explanation method explored in this work, we further extend the idea to explaining the decision boundaries of GNNs. We propose another model-level explainability method called GNNBoundary. Please check this [repository](https://github.com/yolandalalala/GNNBoundary) for more details.
 
 
